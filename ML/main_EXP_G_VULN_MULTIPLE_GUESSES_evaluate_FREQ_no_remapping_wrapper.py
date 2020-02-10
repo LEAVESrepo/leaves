@@ -1,0 +1,4 @@
+from EXP_G_VULN_MULTIPLE_GUESSES import main_EXP_G_VULN_MULTIPLE_GUESSES_evaluate_FREQUENTIST_no_remapping
+
+if __name__ == '__main__':
+    main_EXP_G_VULN_MULTIPLE_GUESSES_evaluate_FREQUENTIST_no_remapping.main_EXP_G_VULN_MULTIPLE_GUESSES_evaluate_FREQ_no_remapping()

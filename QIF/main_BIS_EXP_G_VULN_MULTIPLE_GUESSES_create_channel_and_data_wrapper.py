@@ -1,0 +1,9 @@
+from BIS_EXP_G_VULN_MULTIPLE_GUESSES import main_BIS_EXP_G_VULN_MULTIPLE_GUESSES_create_channel_and_data
+
+
+def main_BIS_EXP_G_VULN_MULTIPLE_GUESSES_create_channel_and_data_wrapper():
+    main_BIS_EXP_G_VULN_MULTIPLE_GUESSES_create_channel_and_data.main_BIS_EXP_G_VULN_MULTIPLE_GUESSES_create_channel_and_data()
+
+
+if __name__ == '__main__':
+    main_BIS_EXP_G_VULN_MULTIPLE_GUESSES_create_channel_and_data_wrapper()
