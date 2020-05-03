@@ -84,3 +84,28 @@ def compute_g_vuln_star(channel, rows, cols, secret_prior_dict, g_mat, g_mat_row
     #   negative
     # return 1 - round(sum_, 3)
     return round(sum_, 3)
+
+
+def compute_g_vuln_with_remapping_positional(final_mat, g_mat):
+    #   final mat has 3 cols: observables, secrets, remapping given by the classifier (f(observ))
+
+    unique_obs = np.unique(final_mat[:, 0])
+
+    sum_ = 0
+
+    for j_ter in range(len(unique_obs)):
+        unique_ob = unique_obs[j_ter]
+        ob_idx = np.where(final_mat[:, 0] == unique_ob)[0]
+        unique_secr, occurr = np.unique(final_mat[ob_idx, 1], return_counts=True)
+        remap = final_mat[ob_idx, 2]
+        if len(np.unique(remap)) != 1:
+            err_hndl.runtime_error_handler(str_="not_determ", add=inspect.stack()[0][3])
+        remap = remap[0]
+        for i_ter in range(len(unique_secr)):
+            #   p_so is the joint probability of a secret and observable
+            p_so = occurr[i_ter] / float(final_mat.shape[0])
+            g_element = g_mat[remap, unique_secr[i_ter]]  # in both guess and secret field the name coincides with the idx
+            sum_ += p_so * float(g_element)
+
+    # return 1 - round(sum_, 3)
+    return round(sum_, 3)

@@ -1,6 +1,9 @@
+import sys
 import copy
+import time
 import operator
 import numpy as np
+from utilities_pckg import utilities
 
 
 def find_best_guess_multiple_guesses(o, train_data, all_possible_guesses_dic, n_guesses, counter_secrets):
@@ -193,3 +196,152 @@ def g_vuln_freq_computation_multiple_guesses_monodimensional_observables(train_d
             g_vuln_freq += test_p_x_y * g_w_s
 
     return round(g_vuln_freq, 3)
+
+
+def find_best_mono_guess_general_approach(test_set, training_set, g_mat, g_mat_rows, g_mat_cols, research_obs_dic,
+                                          research_sec_dic, g_mat_most_frequent_secret_idx, unq_obs_tr, unq_obs_tr_cnt,
+                                          unq_secr_tr, test_obs_unique):
+    start_time = time.time()
+
+    res_dic = {}
+
+    for test_obs_idx in range(len(test_obs_unique)):
+        test_obs = test_obs_unique[test_obs_idx]
+
+        tmp_dic = {}
+
+        for guess in g_mat_rows:
+            tmp_sum = 0
+            g_mat_guess_idx = np.where(g_mat_rows == guess)[0]
+
+            if test_obs not in unq_obs_tr:
+                tmp_sum += g_mat[g_mat_guess_idx, g_mat_most_frequent_secret_idx]
+
+            else:
+                obs_cnt_train = unq_obs_tr_cnt[np.where(unq_obs_tr == test_obs)[0]]
+                for x in unq_secr_tr:
+                    # p_xIy = len(np.where((training_set[:0] == test_obs) & (training_set[:, 1] == x))[0]) / float(
+                    #     training_set.shape[0])
+                    # p_xIy = len(np.where((training_set[:, 0] == test_obs) & (training_set[:, 1] == x))[0]) / float(
+                    #     obs_cnt_train)
+
+                    lst1 = research_obs_dic[test_obs]
+                    lst2 = research_sec_dic[x]
+
+                    p_xIy = len(utilities.array_intersection(lst1=lst1, lst2=lst2)) / float(obs_cnt_train)
+
+                    g_mat_secret_idx = np.where(g_mat_cols == x)[0]
+                    tmp_sum += p_xIy * g_mat[g_mat_guess_idx, g_mat_secret_idx]
+
+            tmp_dic[guess] = tmp_sum
+
+        res_dic[test_obs] = max(tmp_dic.iteritems(), key=operator.itemgetter(1))[0]
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    return res_dic
+
+
+def compute_freq_g_vuln_mono_guess_general_approach(test_set, best_mono_guess_res, g_mat, g_mat_cols, g_mat_rows,
+                                                    test_obs_unq, test_secrets_col_int, secrets_type="int"):
+    start_time = time.time()
+
+    res_sum = 0
+    for test_obs in test_obs_unq:
+        data_of_interest_idx = np.where(test_set[:, 0] == test_obs)[0]
+        data_of_interest = test_set[data_of_interest_idx, :]
+        if secrets_type == "int":
+            secrets_of_interest = np.unique(np.array(data_of_interest[:, 1], dtype=int))
+        elif secrets_type == "str":
+            secrets_of_interest = np.unique(np.array(data_of_interest[:, 1], dtype=str))
+
+        for sec in secrets_of_interest:
+            p_xy = len(np.where((test_set[:, 0] == test_obs) & (test_secrets_col_int == sec))[0]) / float(
+                test_set.shape[0])
+
+            g_mat_guess_idx = np.where(g_mat_rows == best_mono_guess_res[test_obs])[0]
+            g_mat_secret_idx = np.where(g_mat_cols == sec)[0]
+
+            res_sum += p_xy * g_mat[g_mat_guess_idx, g_mat_secret_idx]
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    return res_sum
+
+
+###########################################################################################################################
+
+def find_best_mono_guess_general_approach_positional(g_mat, g_mat_rows,
+                                                     research_obs_dic,
+                                                     research_sec_dic, g_mat_most_frequent_secret_idx, unq_obs_tr,
+                                                     unq_obs_tr_cnt,
+                                                     unq_secr_tr, test_obs_unique):
+    start_time = time.time()
+
+    res_dic = {}
+
+    for test_obs_idx in range(len(test_obs_unique)):
+        test_obs = test_obs_unique[test_obs_idx]
+
+        tmp_dic = {}
+
+        for guess in g_mat_rows:
+            tmp_sum = 0
+            g_mat_guess_idx = guess  # guess 0 idx 0 and guess 1 idx 1
+
+            if test_obs not in unq_obs_tr:
+                tmp_sum += g_mat[g_mat_guess_idx, g_mat_most_frequent_secret_idx]
+
+            else:
+                obs_cnt_train = unq_obs_tr_cnt[np.where(unq_obs_tr == test_obs)[0]]
+                for x in unq_secr_tr:
+                    # p_xIy = len(np.where((training_set[:0] == test_obs) & (training_set[:, 1] == x))[0]) / float(
+                    #     training_set.shape[0])
+                    # p_xIy = len(np.where((training_set[:, 0] == test_obs) & (training_set[:, 1] == x))[0]) / float(
+                    #     obs_cnt_train)
+
+                    lst1 = research_obs_dic[test_obs]
+                    lst2 = research_sec_dic[x]
+
+                    p_xIy = len(utilities.array_intersection(lst1=lst1, lst2=lst2)) / float(obs_cnt_train)
+
+                    g_mat_secret_idx = x  # the secret's value corresponds to the index
+                    tmp_sum += p_xIy * g_mat[g_mat_guess_idx, g_mat_secret_idx]
+
+            tmp_dic[guess] = tmp_sum
+
+        res_dic[test_obs] = max(tmp_dic.iteritems(), key=operator.itemgetter(1))[0]
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    return res_dic
+
+
+def compute_freq_g_vuln_mono_guess_general_approach_posiitional(test_set, best_mono_guess_res, g_mat,
+                                                                g_mat_rows,
+                                                                test_obs_unq, test_secrets_col_int, secrets_type="int"):
+    start_time = time.time()
+
+    res_sum = 0
+    for test_obs in test_obs_unq:
+        data_of_interest_idx = np.where(test_set[:, 0] == test_obs)[0]
+        data_of_interest = test_set[data_of_interest_idx, :]
+        if secrets_type == "int":
+            secrets_of_interest = np.unique(np.array(data_of_interest[:, 1], dtype=int))
+        elif secrets_type == "str":
+            secrets_of_interest = np.unique(np.array(data_of_interest[:, 1], dtype=str))
+        else:
+            sys.exit("ERRRRRRRRRRROOOOOOOOOOOOOOORRRRRRRRRRRRRRR!!!!!!!!!!!!")
+
+        for sec in secrets_of_interest:
+            p_xy = len(np.where((test_set[:, 0] == test_obs) & (test_secrets_col_int == sec))[0]) / float(
+                test_set.shape[0])
+
+            g_mat_guess_idx = best_mono_guess_res[test_obs]  # guess 0 idx 0 and guess 1 idx 1
+            g_mat_secret_idx = sec  # the secret's value corresponds to the index
+
+            res_sum += p_xy * g_mat[g_mat_guess_idx, g_mat_secret_idx]
+
+    print("--- %s seconds ---" % (time.time() - start_time))
+
+    return res_sum

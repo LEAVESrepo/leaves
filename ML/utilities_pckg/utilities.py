@@ -152,3 +152,33 @@ def compute_prior_distribution_from_array_of_symbols(array):
     for element in copy_of_symbols_map:
         copy_of_symbols_map[element] = copy_of_symbols_map[element] / float(len(array))
     return copy_of_symbols_map
+
+
+def reduce_data_dimensionality(data, cvrt_to_int=False):
+    new_data = []
+
+    for i in range(data.shape[0]):
+        new_record = ""
+
+        for j in range(data.shape[1] - 1):
+            if cvrt_to_int:
+                new_record += str(int(data[i, j])) + "-"
+            else:
+                new_record += str(data[i, j]) + "-"
+
+        new_data.append(new_record[:-1])
+
+    new_data = np.array(new_data).reshape(data.shape[0], 1)
+    new_data = np.column_stack((new_data, data[:, -1]))
+
+    return new_data
+
+
+def find_most_frequent_symbol_in_array(array):
+    unq_array, unq_array_cnt = np.unique(array, return_counts=True)
+
+    return unq_array[np.argmax(unq_array_cnt)]
+
+
+def array_intersection(lst1, lst2):
+    return list(set(lst1) & set(lst2))
