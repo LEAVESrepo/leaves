@@ -22,7 +22,7 @@ BATCH_SIZE = 512
 ID_GPU = "0"
 PERC_GPU = 0.3
 MODEL_NAME = ""
-NUM_CLASSES = 45
+NUM_CLASSES = 2 # or higher number but 2 is enough since it is only 0, 1
 
 
 def read_command_line_options():
