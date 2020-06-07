@@ -214,10 +214,10 @@ def main_EXP_G_VULN_DP_evaluate_ANN_remapping():
 
                     print X_test
                     print max_tr, min_tr
-                    X_test_preprocessed = preprocess.scaler_zero_one_all_cols(data=X_test, max_=max_tr, min_=min_tr)
+                    X_test_preprocessed = preprocess.scaler_zero_one_all_cols_ts(data_tr=training_set[:, 0:training_set.shape[1] - 2], data=X_test, max_=max_tr, min_=min_tr)
                     print X_test_preprocessed
 
-                    X_test_preprocessed_unique = preprocess.scaler_zero_one_all_cols(data=X_test_unique,
+                    X_test_preprocessed_unique = preprocess.scaler_zero_one_all_cols_ts(data_tr=training_set[:, 0:training_set.shape[1] - 2], data=X_test_unique,
                                                                                      max_=max_tr, min_=min_tr)
 
                     # if len(X_test_preprocessed_unique) != len(np.unique(X_test_preprocessed_unique)):
