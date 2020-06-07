@@ -4,7 +4,7 @@ import numpy as np
 
 def scaler_zero_one_all_cols(data, min_, max_, default=True):
 
-    if defailt is False:
+    if default is False:
         print data.shape
         data_cpy = copy.deepcopy(data)
         data_cpy = data_cpy.astype(np.float64)
