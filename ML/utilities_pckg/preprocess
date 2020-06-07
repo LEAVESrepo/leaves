@@ -26,3 +26,21 @@ def scaler_zero_one_all_cols(data, min_, max_, default=True):
                 data_cpy[row, col] = (data_cpy[row, col] - min_) / float(max_ - min_)
 
         return data_cpy
+        
+        
+def scaler_zero_one_all_cols_ts(data_tr, data, min_, max_, default=True):
+    if default is True:
+        data_cpy = copy.deepcopy(data)
+        data_cpy = data_cpy.astype(np.float64)
+
+        for col in range(data_cpy.shape[1]):
+            max_ = max(data_tr[:, col])
+            min_ = min(data_tr[:, col])
+            for row in range(data_cpy.shape[0]):
+                data_cpy[row, col] = (data_cpy[row, col] - min_) / float(max_ - min_)
+
+        return data_cpy
+        
+    else:
+        return scaler_zero_one_all_cols(data, min_, max_, default=False)
+
